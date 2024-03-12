@@ -16,10 +16,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./asserts/css/style.css" />
-    <link
-      rel="stylesheet"
-      href="./asserts/music/NoiNayCoAnh-SonTungMTP-4772041.mp3"
-    />
   </head>
   <body>
     <div class="player">
@@ -69,25 +65,30 @@
           step="1"
           min="0"
           max="100"
+          aria-label="Progress"
         />
 
         <audio id="audio" src=""></audio>
       </div>
 
       <!-- Playlist -->
-      <div class="playlist">
-       
-      </div>
+      <div class="playlist"></div>
     </div>
 
     <script>
       const $ = document.querySelector.bind(document);
       const $$ = document.querySelectorAll.bind(document);
-      const playlist = $('.playlist');
-
-
+      const player = $(".player");
+      const playlist = $(".playlist");
+      const heading = $("header h2");
+      const cdThumb = $(".cd-thumb");
+      const audio = $("#audio");
+      const cd = $(".cd");
+      const playBtn = $(".btn-toggle-play");
+      const progress = $("#progress");
       const app = {
         currentIndex: 0,
+        isPlaying: false,
         songs: [
           {
             name: "Querry",
@@ -101,6 +102,33 @@
             path: "./asserts/music/NoiNayCoAnh-SonTungMTP-4772041.mp3",
             image: "./asserts/img/maxresdefault.jpg",
           },
+          {
+            name: "Ghé qua",
+            singer: "Dick x Tofu x PC",
+            path: "./asserts/music/GheQua-TaynguyenSoundTofuPC-7031399.mp3",
+            image: "./asserts/img/maxresdefault (1).jpg",
+          },
+          {
+            name: "Từng quen",
+            singer: "Wren Evans x Ltsnk",
+            path: "./asserts/music/b76sn4ccpk.mp3",
+            image: "./asserts/img/OIP.jpg",
+          },
+          {
+            name: "Hẹn một mai (Remix)",
+            singer: "LouB",
+            path: "./asserts/music/Hẹn Một Mai - LouB Remix.mp3",
+            image: "./asserts/img/maxresdefault (2).jpg",
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
         ],
 
         render: function () {
@@ -119,23 +147,83 @@
           </div>
                     `;
           });
-          $('.playlist').innerHTML = htmls.join('');
+          $(".playlist").innerHTML = htmls.join("");
         },
-        handleEvents: function() {
-          const cd = $('.cd');
+        defineProperties: function () {
+          Object.defineProperty(this, "currentSong", {
+            get: function () {
+              return this.songs[this.currentIndex];
+            },
+          });
+        },
+        handleEvents: function () {
+          const _this = this;
           const cdWidth = cd.offsetWidth;
-          document.onscroll = function() {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+          // Resize CD
+          document.onscroll = function () {
+            const scrollTop =
+              window.scrollY || document.documentElement.scrollTop;
             const newCdWidth = cdWidth - scrollTop;
 
-
-            cd.style.width = newCdWidth  > 0 ? newCdWidth + 'px' : 0;
+            cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
             cd.style.opacity = newCdWidth / cdWidth;
-          }
+          };
+
+          // Handle click button play
+          playBtn.onclick = function () {
+            if (_this.isPlaying) {
+              audio.pause();
+            } else {
+              audio.play();
+            }
+          };
+
+          // Khi song được play
+          audio.onplay = function () {
+            _this.isPlaying = true;
+            player.classList.add("playing");
+          };
+          // Khi song được pause
+          audio.onpause = function () {
+            _this.isPlaying = false;
+            player.classList.remove("playing");
+          };
+
+          // Khi progress of song bị change
+          audio.ontimeupdate = function () {
+            if (audio.duration) {
+              const progressPercent = Math.floor(
+                (audio.currentTime / audio.duration) * 100
+              );
+              progress.value = progressPercent;
+            }
+          };
+
+          // Handle khi tua song
+          progress.oninput = function (e) {
+            const seekTime = (audio.duration / 100) * e.target.value;
+            audio.currentTime = seekTime;
+          };
         },
+        loadCurrentSong: function () {
+          heading.textContent = this.currentSong.name;
+          cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
+          audio.src = this.currentSong.path;
+          console.log(heading, cdThumb, audio);
+        },
+
         start: function () {
+          // Định nghĩa các thuộc tính cho Object
+          this.defineProperties();
+
+          // Xử lý các event liên quan đến DOM
           this.handleEvents();
-          
+
+          //Tải the first song vào UI
+          this.loadCurrentSong();
+
+          // Render playlist
           this.render();
         },
       };
