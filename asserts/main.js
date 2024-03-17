@@ -53,15 +53,55 @@ const app = {
       path: "./asserts/music/Hẹn Một Mai - LouB Remix.mp3",
       image: "./asserts/img/maxresdefault (2).jpg",
     },
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
+    {
+      name: "Tip Toe (Speed Up)",
+      singer: "HYBS",
+      path: "./asserts/music/Tip Toe - HYBS (speed up).mp3",
+      image: "./asserts/img/image.png",
+    },
+    {
+      name: "Chúng ta của tương lai",
+      singer: "Sơn Tùng MTP",
+      path: "./asserts/music/CHÚNG TA CỦA TƯƠNG LAI.mp3",
+      image: "./asserts/img/OIP (1).jpg",
+    },
+    {
+      name: "Không thể say",
+      singer: "Hiếu Thứ Hai",
+      path: "./asserts/music/Không Thể Say Acoustic - HIEUTHUHAI _ Sóng 24.mp3",
+      image:
+        "./asserts/img/img4223-159645832189821262293-16695167177912039970600.webp",
+    },
+    {
+      name: "Miên man",
+      singer: "Minh Huy",
+      path: "./asserts/music/Miên Man - Minh Huy (Dmean remake).mp3",
+      image: "./asserts/img/hgjh.jpg",
+    },
+    {
+      name: "Rồi em sẽ gặp một chàng trai khác",
+      singer: "Hippo Happy",
+      path: "./asserts/music/Rồi Em Sẽ Gặp Một Chàng Trai Khác (Live) - HippoHappy.mp3",
+      image: "./asserts/img/artworks-Y21CPZqVpfFK2OGL-Ptz2IA-t500x500.jpg",
+    },
+    {
+      name: "Anh nhớ ra",
+      singer: "Vũ",
+      path: "./asserts/music/Anh Nhớ Ra - Vũ Live At Soul Of The Forest.mp3",
+      image: "./asserts/img/ggg.jpg",
+    },
+    {
+      name: "pho real",
+      singer: "bbno$ x Low G x Anh Phan",
+      path: "./asserts/music/bbno$ x Low G x Anh Phan - pho real.mp3",
+      image: "./asserts/img/artworks-nRMZtK73Cdytb5cy-G3azlg-t500x500.jpg",
+    },
+    {
+      name: "Sau lời từ khước (remix)",
+      singer: "Phan Mạnh Quỳnh",
+      path: "./asserts/music/Sau lời từ khước - Phan Mạnh Quỳnh (Remix).mp3",
+      image: "./asserts/img/jhg.png",
+    },
   ],
   setConfig: function (key, value) {
     this.config[key] = value;
@@ -70,20 +110,22 @@ const app = {
   render: function () {
     const htmls = this.songs.map((song, index) => {
       return `
-              <div class="song ${
-                index == this.currentIndex ? "active" : ""
-              }" data-index="${index}">
+        <div class="song ${
+          index == this.currentIndex ? "active" : ""
+        }" data-index="${index}">
       <div class="thumb" style="background-image: url('${song.image}')">
       </div>
       <div class="body">
         <h3 class="title">${song.name}</h3>
         <p class="author">${song.singer}</p>
       </div>
+      <div class="modal">
       <div class="option">
-        <i class="fas fa-ellipsis-h"></i>
+      <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+      </div>
       </div>
     </div>
-              `;
+        `;
     });
     playlist.innerHTML = htmls.join("");
   },
@@ -184,7 +226,7 @@ const app = {
       if (_this.isRepeat) {
         audio.play();
       } else {
-        nextBtn.click;
+        nextBtn.click();
       }
     };
 
@@ -210,8 +252,19 @@ const app = {
         }
 
         // Handle click on Option
-        if( e.target.closest(".option")){
-            
+        if (e.target.closest(".option")) {
+          var confirmDelete = confirm("Do you want to remove this song?");
+          if (confirmDelete) {
+            const index = _this.currentIndex;
+            console.log(index);
+            _this.songs.splice(index, 1);
+            _this.loadCurrentSong();
+            _this.render();
+            alert("The song has been deleted."); // Thông báo khi bài hát đã được xoá
+          } else {
+            alert("Cancelled"); // Thông báo khi hủy bỏ việc xoá bài hát
+          }
+          console.log(_this.currentIndex);
         }
       }
     };
@@ -229,7 +282,6 @@ const app = {
     heading.textContent = this.currentSong.name;
     cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
     audio.src = this.currentSong.path;
-    console.log(heading, cdThumb, audio);
   },
   loadConfig: function () {
     this.isRandom = this.config.isRandom;
@@ -249,6 +301,7 @@ const app = {
     }
     this.loadCurrentSong();
   },
+  updatePlayList: function () {},
   playRandomSong: function () {
     let newIndex;
     do {
@@ -274,8 +327,8 @@ const app = {
     this.render();
 
     // Show initial state of button repeat and random
-    randomBtn.classList.toggle("active", _this.isRandom);
-    randomBtn.classList.toggle("active", _this.isRepeat);
+    randomBtn.classList.toggle("active", this.isRandom);
+    randomBtn.classList.toggle("active", this.isRepeat);
   },
 };
 app.start();
